@@ -1,0 +1,60 @@
+server:
+  port: ${PORT:5050}
+
+spring:
+  application:
+    name: ai-supportpilot-api
+  mail:
+    host: ${SMTP_HOST:}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
+  spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:supportpilot}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  jackson:
+    time-zone: UTC
+    serialization:
+      write-dates-as-timestamps: false
+
+supportpilot:
+  python-api-url: "${PYTHON_API_URL:http://localhost:8000}"
+  jwt-secret: "${JWT_SECRET:AI-SupportPilot-Secret-Key-Change-In-Production-2024}"
+  jwt-expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  mail:
+    enabled: ${MAIL_ENABLED:false}
+    from: "${SMTP_FROM:}"
+  email-api-key: "${EMAIL_API_KEY:}"
+  jira:
+    enabled: ${JIRA_ENABLED:false}
+    base-url: "${JIRA_BASE_URL:}"
+    email: "${JIRA_EMAIL:}"
+    api-token: "${JIRA_API_TOKEN:}"
+    project-key: "${JIRA_PROJECT_KEY:}"
+    issue-type: "${JIRA_ISSUE_TYPE:Task}"
+
+logging:
+  level:
+    com.supportpilot: INFO
+    org.springframework.security: WARN

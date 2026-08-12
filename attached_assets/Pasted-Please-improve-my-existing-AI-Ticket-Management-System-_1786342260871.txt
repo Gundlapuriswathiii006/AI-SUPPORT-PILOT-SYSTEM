@@ -1,0 +1,38 @@
+Please improve my existing AI Ticket Management System. Do not rebuild the project or remove any existing features. Keep the current functionality, database, dashboard, knowledge base, priority system, and escalation system.
+
+Please implement these improvements:
+
+1. Email Integration
+    * Allow agents to send a reply directly to the customer’s actual email address from the ticket.
+    * Keep the email conversation linked to the same ticket.
+    * Show sent and received emails in the ticket conversation/timeline.
+    * Use the customer’s existing email stored with the ticket.
+2. Incoming Email → Ticket
+    * Allow incoming customer emails to automatically create tickets.
+    * Extract the sender email, subject, and message.
+    * Connect the new ticket with the existing AI, priority, knowledge base, dashboard, and escalation features.
+    * If real email receiving cannot be configured, provide a simple demo/test method.
+3. Customer Chat Widget
+    * Add a small floating chat window in the bottom-right corner.
+    * Customers can ask common support questions.
+    * Use the existing knowledge base to generate automatic answers.
+    * Keep the chat UI simple, modern, and consistent with the existing application.
+4. Automatic Responses
+    * Automatically answer common questions such as password reset, refunds, account issues, and basic support queries.
+    * If the AI cannot provide a suitable answer, give the customer an option to create a ticket or contact a support agent.
+5. AI Suggested Reply
+    * Add a “Generate AI Reply” option to the existing ticket page.
+    * Use the ticket information and existing knowledge base.
+    * Allow the agent to edit the response before sending it to the customer’s actual email.
+    * Do not automatically send AI-generated replies without agent approval.
+6. Improve Existing UI
+    * Review the entire existing application.
+    * Improve only areas that look unfinished, inconsistent, or less professional.
+    * Improve spacing, alignment, typography, buttons, forms, loading states, error messages, empty states, responsiveness, and navigation where needed.
+    * Do not unnecessarily redesign parts that already look good.
+7. Important
+    * Reuse existing features instead of creating duplicates.
+    * Do not recreate the existing dashboard, knowledge base, priority system, or escalation system.
+    * Keep the application professional and suitable for a final-year project demonstration.
+    * Make sure the new features integrate properly with the existing system.
+        ::

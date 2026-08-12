@@ -1,0 +1,29 @@
+.sp-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.13));
+  background: var(--bg-card, #141c2e);
+  color: var(--text, #e2e8f0);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition, 0.2s ease);
+}
+
+.sp-theme-toggle:hover {
+  background: var(--bg-card-hover, #1a2340);
+  border-color: var(--accent, #3b82f6);
+}
+
+.sp-theme-toggle-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+@media (max-width: 640px) {
+  .sp-theme-toggle-label { display: none; }
+  .sp-theme-toggle { padding: 0.5rem; }
+}

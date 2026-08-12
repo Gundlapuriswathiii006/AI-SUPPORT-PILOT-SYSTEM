@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # ─── PostgreSQL ──────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: supportpilot-db
+    environment:
+      POSTGRES_DB: supportpilot
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ─── Python AI Microservice ──────────────────────────────────────────────────
+  python-ai:
+    build:
+      context: ./python-api
+      dockerfile: Dockerfile
+    container_name: supportpilot-python-ai
+    environment:
+      PORT: "8000"
+      LOG_LEVEL: INFO
+      # OPENAI_API_KEY: ${OPENAI_API_KEY}   # uncomment for real LLM calls
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Java Spring Boot API ────────────────────────────────────────────────────
+  java-api:
+    build:
+      context: ./java-api
+      dockerfile: Dockerfile
+    container_name: supportpilot-java-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      python-ai:
+        condition: service_healthy
+    environment:
+      PORT: "5000"
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: supportpilot
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      PYTHON_API_URL: http://python-ai:8000
+      JWT_SECRET: "${JWT_SECRET:-AI-SupportPilot-Change-This-In-Production}"
+      MAIL_ENABLED: "${MAIL_ENABLED:-false}"
+      SMTP_HOST: "${SMTP_HOST:-}"
+      SMTP_PORT: "${SMTP_PORT:-587}"
+      SMTP_USERNAME: "${SMTP_USERNAME:-}"
+      SMTP_PASSWORD: "${SMTP_PASSWORD:-}"
+      SMTP_FROM: "${SMTP_FROM:-}"
+      EMAIL_API_KEY: "${EMAIL_API_KEY:-}"
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/actuator/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  postgres_data:

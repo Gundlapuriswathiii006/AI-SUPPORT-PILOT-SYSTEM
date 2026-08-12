@@ -1,0 +1,7 @@
+/* Base reset – main styles live in assets/theme.css */
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; }
+html, body, #root {
+  width: 100%;
+  min-height: 100vh;
+}

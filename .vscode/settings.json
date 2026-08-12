@@ -1,0 +1,39 @@
+{
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.import.maven.enabled": true,
+  "java.project.importOnFirstTimeStartup": "automatic",
+  "java.import.generatesMetadataFilesAtProjectRoot": false,
+  "java.import.exclusions": [
+    "**/node_modules/**",
+    "**/.git/**",
+    "**/dist/**",
+    "**/build/**"
+  ],
+  "java.project.resourceFilters": [
+    "node_modules",
+    ".git",
+    "dist",
+    "build"
+  ],
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/target/**": true
+  },
+  "files.exclude": {
+    "**/node_modules": true
+  },
+  "sonarlint.rules": {
+    "java:S1220": "off",
+    "java:S1186": "off",
+    "java:S1118": "off",
+    "java:S2094": "off",
+    "java:S6204": "off",
+    "java:S6813": "off"
+  },
+  "sonarlint.analyzerProperties": {
+    "sonar.exclusions": "**/node_modules/**,**/target/**"
+  },
+  "[java]": {
+    "editor.defaultFormatter": "redhat.java"
+  }
+}
