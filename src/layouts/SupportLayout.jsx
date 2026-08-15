@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import ThemeToggle from '../components/ThemeToggle/index.jsx';
+
 
 const supportLinks = [
   { to: '/support', label: 'Dashboard', end: true },
   { to: '/support/tickets', label: 'All Tickets' },
- 
+  { to: '/support/jira', label: 'JIRA' },          // ← add this line
   { to: '/support/analytics', label: 'Analytics' },
   { to: '/support/escalations', label: 'Escalations' },
   { to: '/support/knowledge-base', label: 'Knowledge Base' },
@@ -59,7 +59,7 @@ export default function SupportLayout() {
           >
             ☰
           </button>
-          <ThemeToggle />
+         
           <div className="sp-user-chip">
             <div className="sp-user-avatar">{initials}</div>
             <span>{firstName}</span>

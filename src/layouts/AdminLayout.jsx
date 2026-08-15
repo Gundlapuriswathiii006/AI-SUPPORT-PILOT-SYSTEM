@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import ThemeToggle from '../components/ThemeToggle/index.jsx';
+
 import { useNavigate } from 'react-router-dom';
 
 const adminLinks = [
   { to: '/admin', label: 'Dashboard', end: true },
   { to: '/admin/users', label: 'User Management' },
   { to: '/admin/tickets', label: 'Ticket Monitoring' },
+  { to: '/admin/jira', label: 'JIRA' },
   { to: '/admin/knowledge-base', label: 'Knowledge Base' },
   { to: '/admin/reports', label: 'Reports' },
   { to: '/admin/settings', label: 'Settings' },
@@ -59,7 +60,7 @@ export default function AdminLayout() {
           >
             ☰
           </button>
-          <ThemeToggle />
+         
           <div className="sp-user-chip">
             <div className="sp-user-avatar">{initials}</div>
             <span>{firstName}</span>

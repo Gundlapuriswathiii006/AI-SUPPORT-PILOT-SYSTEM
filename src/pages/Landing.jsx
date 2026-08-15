@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import ThemeToggle from '../components/ThemeToggle/index.jsx';
+
 
 const LandingPage = () => {
   return (
@@ -7,7 +7,7 @@ const LandingPage = () => {
       <nav className="sp-landing-nav d-flex align-items-center justify-content-between px-4 py-3">
         <span className="sp-sidebar-kicker fs-4">SupportPilot</span>
         <div className="d-flex gap-2 align-items-center">
-          <ThemeToggle />
+         
           <Link to="/login" className="btn btn-outline-info">Login</Link>
           <Link to="/register" className="btn btn-info">Get Started</Link>
         </div>

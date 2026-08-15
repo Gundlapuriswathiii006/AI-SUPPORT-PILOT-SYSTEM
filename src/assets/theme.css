@@ -4,45 +4,6 @@
    ===================================================== */
 
 :root {
-  --bg-root: #080c14;
-  --bg-surface: #0f1523;
-  --bg-card: #141c2e;
-  --bg-card-hover: #1a2340;
-  --bg-sidebar: #0b1120;
-  --bg-input: #0f1829;
-  --border: rgba(255, 255, 255, 0.07);
-  --border-strong: rgba(255, 255, 255, 0.13);
-
-  --accent: #3b82f6;
-  --accent-hover: #2563eb;
-  --accent-glow: rgba(59, 130, 246, 0.25);
-  --cyan: #06b6d4;
-  --cyan-hover: #0891b2;
-  --cyan-glow: rgba(6, 182, 212, 0.2);
-  --purple: #8b5cf6;
-  --green: #10b981;
-  --yellow: #f59e0b;
-  --red: #ef4444;
-  --orange: #f97316;
-
-  --text: #e2e8f0;
-  --text-muted: #8892a4;
-  --text-dim: #5a6478;
-
-  --radius: 12px;
-  --radius-sm: 8px;
-  --radius-lg: 18px;
-  --shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
-  --transition: 0.2s ease;
-}
-
-/* =====================================================
-   Light theme overrides
-   Toggled by setting data-theme="light" on <html>
-   (see src/context/ThemeContext.jsx + ThemeToggle component)
-   ===================================================== */
-:root[data-theme='light'] {
   --bg-root: #f4f6fb;
   --bg-surface: #ffffff;
   --bg-card: #ffffff;
@@ -68,8 +29,12 @@
   --text-muted: #475569;
   --text-dim: #64748b;
 
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 18px;
   --shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
   --shadow-lg: 0 8px 32px rgba(15, 23, 42, 0.12);
+  --transition: 0.2s ease;
 }
 
 /* ---- Reset & Base ---- */
@@ -135,7 +100,7 @@ body {
 
 .badge.text-bg-info { background: var(--cyan-glow) !important; color: var(--cyan) !important; border: 1px solid var(--cyan) !important; }
 .badge.text-bg-secondary { background: rgba(100,116,139,0.2) !important; color: #94a3b8 !important; border: 1px solid rgba(100,116,139,0.3) !important; }
-.badge.text-bg-dark { background: rgba(30,41,59,0.8) !important; color: var(--text-muted) !important; border: 1px solid var(--border-strong) !important; }
+.badge.text-bg-dark { background: rgba(30,41,59,0.8) !important; color: #e2e8f0 !important; border: 1px solid var(--border-strong) !important; }
 
 /* =====================================================
    LANDING PAGE
@@ -247,11 +212,11 @@ body {
    AUTH PAGES (Login / Register)
    ===================================================== */
 .sp-auth-screen {
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
   background:
     radial-gradient(ellipse 70% 50% at 20% 50%, rgba(59,130,246,0.12) 0%, transparent 55%),
     radial-gradient(ellipse 50% 40% at 80% 20%, rgba(6,182,212,0.1) 0%, transparent 50%),
@@ -271,7 +236,7 @@ body {
 
 .sp-auth-hero {
   padding: 3.5rem;
-  background: linear-gradient(135deg, #0d1829 0%, #111827 40%, #0f1e2e 100%);
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 40%, #e0f2fe 100%);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -590,7 +555,7 @@ body {
 
 .sp-btn-secondary {
   background: rgba(255,255,255,0.05);
-  color: var(--text-muted);
+  color: #cbd5e6;
   border-color: var(--border-strong);
 }
 .sp-btn-secondary:hover { background: rgba(255,255,255,0.09); color: var(--text); border-color: var(--border-strong); }

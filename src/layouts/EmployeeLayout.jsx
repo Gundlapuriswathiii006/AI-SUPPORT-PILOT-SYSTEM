@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import ThemeToggle from '../components/ThemeToggle/index.jsx';
+
 
 const navLinks = [
   { to: '/employee', label: 'Dashboard', end: true },
   { to: '/employee/tickets/new', label: 'Create Ticket' },
   { to: '/employee/tickets', label: 'My Tickets' },
+  { to: '/employee/jira', label: 'JIRA' },          // ← add this line
   { to: '/employee/knowledge-base', label: 'Knowledge Base' },
 ];
-
 export default function EmployeeLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -84,7 +84,7 @@ export default function EmployeeLayout() {
           >
             ☰
           </button>
-          <ThemeToggle />
+        
           <div className="sp-user-chip">
             <div className="sp-user-avatar">{initials}</div>
             <span>{firstName}</span>

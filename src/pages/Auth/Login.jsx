@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../hooks/useAuth.js';
 import Loader from '../../components/common/Loader/index.jsx';
-import ThemeToggle from '../../components/ThemeToggle/index.jsx';
+
 
 const LoginPage = () => {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -28,9 +28,8 @@ const LoginPage = () => {
 
   return (
     <div className="sp-auth-screen">
-      <div style={{ position: 'absolute', top: '1.25rem', right: '1.25rem' }}>
-        <ThemeToggle />
-      </div>
+      <div className="sp-auth-card row g-0"></div>
+      
       <div className="sp-auth-card row g-0">
         <div className="col-lg-6 sp-auth-hero">
           <span className="sp-sidebar-kicker">SupportPilot</span>

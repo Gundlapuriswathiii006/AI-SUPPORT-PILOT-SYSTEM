@@ -28,6 +28,7 @@ import KnowledgeBasePage from './pages/Admin/KnowledgeBase.jsx';
 import ReportsPage from './pages/Admin/Reports.jsx';
 import SettingsPage from './pages/Admin/SystemSettings.jsx';
 import TicketMonitoringPage from './pages/Admin/TicketMonitoring.jsx';
+import JiraPage from './pages/Admin/Jira.jsx';
 
 import ProtectedRoute from './components/ProtectedRoute/index.jsx';
 import EmployeeLayout from './layouts/EmployeeLayout.jsx';
@@ -51,33 +52,35 @@ const App = () => {
         <Route path="/unauthorized" element={<Unauthorized />} />
 
         <Route element={<ProtectedRoute roles={['employee']} />}>
-          <Route element={<EmployeeLayout />}>
-            <Route path="/employee" element={<EmployeeDashboard />} />
-            <Route path="/employee/tickets/new" element={<CreateTicketPage />} />
-            <Route path="/employee/tickets" element={<MyTicketsPage />} />
-            <Route path="/employee/tickets/:id" element={<TicketDetailsPage />} />
-            <Route path="/employee/knowledge-base" element={<EmployeeKnowledgeBasePage />} />
-          </Route>
-        </Route>
+  <Route element={<EmployeeLayout />}>
+    <Route path="/employee" element={<EmployeeDashboard />} />
+    <Route path="/employee/tickets/new" element={<CreateTicketPage />} />
+    <Route path="/employee/tickets" element={<MyTicketsPage />} />
+    <Route path="/employee/tickets/:id" element={<TicketDetailsPage />} />
+    <Route path="/employee/knowledge-base" element={<EmployeeKnowledgeBasePage />} />
+    <Route path="/employee/jira" element={<JiraPage />} />       {/* ← add this */}
+  </Route>
+</Route>
 
         <Route element={<ProtectedRoute roles={['support']} />}>
-          <Route element={<SupportLayout />}>
-            <Route path="/support" element={<SupportDashboard />} />
-            <Route path="/support/tickets" element={<SupportTicketsPage />} />
-           
-            <Route path="/support/tickets/:id/resolve" element={<ResolveTicketPage />} />
-            <Route path="/support/analytics" element={<SupportAnalyticsPage />} />
-            <Route path="/support/escalations" element={<EscalationsPage />} />
-            <Route path="/support/knowledge-base" element={<SupportKnowledgeBasePage />} />
-            <Route path="/support/profile" element={<SupportProfilePage />} />
-          </Route>
-        </Route>
+  <Route element={<SupportLayout />}>
+    <Route path="/support" element={<SupportDashboard />} />
+    <Route path="/support/tickets" element={<SupportTicketsPage />} />
+    <Route path="/support/jira" element={<JiraPage />} />        {/* ← add this */}
+    <Route path="/support/tickets/:id/resolve" element={<ResolveTicketPage />} />
+    <Route path="/support/analytics" element={<SupportAnalyticsPage />} />
+    <Route path="/support/escalations" element={<EscalationsPage />} />
+    <Route path="/support/knowledge-base" element={<SupportKnowledgeBasePage />} />
+    <Route path="/support/profile" element={<SupportProfilePage />} />
+  </Route>
+</Route>
 
         <Route element={<ProtectedRoute roles={['admin']} />}>
           <Route element={<AdminLayout />}>
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<UserManagementPage />} />
             <Route path="/admin/tickets" element={<TicketMonitoringPage />} />
+            <Route path="/admin/jira" element={<JiraPage />} />
             <Route path="/admin/knowledge-base" element={<KnowledgeBasePage />} />
             <Route path="/admin/reports" element={<ReportsPage />} />
             <Route path="/admin/settings" element={<SettingsPage />} />

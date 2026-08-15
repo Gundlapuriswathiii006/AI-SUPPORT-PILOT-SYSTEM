@@ -1,3 +1,4 @@
+
 package com.supportpilot.repository;
 
 import com.supportpilot.model.Ticket;
@@ -34,4 +35,7 @@ public interface TicketRepository extends JpaRepository<Ticket, String> {
     List<Object[]> countByMonth();
 
     List<Ticket> findTop5ByOrderByCreatedAtDesc();
+
+    /** Tickets that have been synced to JIRA (jiraIssueKey is set). Used by the JIRA panel. */
+    List<Ticket> findByJiraIssueKeyIsNotNullOrderByCreatedAtDesc();
 }
