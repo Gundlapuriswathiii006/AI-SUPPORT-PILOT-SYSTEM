@@ -11,11 +11,6 @@ import {
 } from 'recharts';
 import { ticketService } from '../../services/ticketService';
 
-const emptyChartData = [
-  { name: '', value: 0 },
-  { name: '', value: 0 },
-];
-
 export default function EmployeeDashboard() {
   const navigate = useNavigate();
   const [stats, setStats] = useState({
@@ -24,6 +19,10 @@ export default function EmployeeDashboard() {
     resolved: 0,
     escalated: 0,
     avgResolution: 0,
+  });
+  const [chartData, setChartData] = useState({
+    ticketTrend: [],
+    resolutionTrend: [],
   });
 
   useEffect(() => {
@@ -46,6 +45,36 @@ export default function EmployeeDashboard() {
           resolved,
           escalated,
           avgResolution,
+        });
+
+        // Ticket Trend: tickets created per day (last 7 days with data)
+        const trendMap = {};
+        tickets.forEach((t) => {
+          if (!t.createdAt) return;
+          const day = new Date(t.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          trendMap[day] = (trendMap[day] || 0) + 1;
+        });
+        const ticketTrend = Object.entries(trendMap)
+          .sort((a, b) => new Date(a[0]) - new Date(b[0]))
+          .slice(-7)
+          .map(([name, value]) => ({ name, value }));
+
+        // Resolution Rate: tickets resolved per day (last 7 days with data)
+        const resolvedMap = {};
+        tickets
+          .filter((t) => t.status === 'resolved' && t.resolvedAt)
+          .forEach((t) => {
+            const day = new Date(t.resolvedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            resolvedMap[day] = (resolvedMap[day] || 0) + 1;
+          });
+        const resolutionTrend = Object.entries(resolvedMap)
+          .sort((a, b) => new Date(a[0]) - new Date(b[0]))
+          .slice(-7)
+          .map(([name, value]) => ({ name, value }));
+
+        setChartData({
+          ticketTrend: ticketTrend.length ? ticketTrend : [{ name: '', value: 0 }],
+          resolutionTrend: resolutionTrend.length ? resolutionTrend : [{ name: '', value: 0 }],
         });
       })
       .catch(() => {/* no backend — keep zeros */});
@@ -206,10 +235,10 @@ export default function EmployeeDashboard() {
             Ticket Trend
           </h2>
           <ResponsiveContainer width="100%" height={160}>
-            <LineChart data={emptyChartData}>
+            <LineChart data={chartData.ticketTrend}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
               <XAxis dataKey="name" tick={{ fill: 'var(--text-dim)', fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: 'var(--text-dim)', fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: 'var(--text-dim)', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text)' }} />
               <Line type="monotone" dataKey="value" stroke="var(--accent)" strokeWidth={2} dot={false} />
             </LineChart>
@@ -229,10 +258,10 @@ export default function EmployeeDashboard() {
             Resolution Rate
           </h2>
           <ResponsiveContainer width="100%" height={160}>
-            <LineChart data={emptyChartData}>
+            <LineChart data={chartData.resolutionTrend}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
               <XAxis dataKey="name" tick={{ fill: 'var(--text-dim)', fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: 'var(--text-dim)', fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: 'var(--text-dim)', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text)' }} />
               <Line type="monotone" dataKey="value" stroke="var(--green)" strokeWidth={2} dot={false} />
             </LineChart>

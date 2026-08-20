@@ -1,131 +1,590 @@
-import React, { useEffect, useState } from 'react';
-import { ticketService } from '../../services/ticketService';
-import Loader from '../../components/common/Loader';
-
-const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+import React, { useEffect, useState } from "react";
+import { ticketService } from "../../services/ticketService";
+import Loader from "../../components/common/Loader";
 
 function Analytics() {
   const [tickets, setTickets] = useState([]);
+  const [days, setDays] = useState(7);
   const [loading, setLoading] = useState(true);
 
+  // ---------------------------------------------------------
+  // FETCH TICKETS
+  // ---------------------------------------------------------
+
   useEffect(() => {
-    ticketService.getAllTickets()
-      .then((data) => setTickets(Array.isArray(data) ? data : []))
-      .finally(() => setLoading(false));
+    const fetchAnalytics = async () => {
+      try {
+        const result = await ticketService.getAllTickets();
+        setTickets(Array.isArray(result) ? result : []);
+      } catch (error) {
+        console.error("Failed to load analytics:", error);
+        setTickets([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalytics();
   }, []);
 
-  if (loading) return <Loader text="Loading analytics..." />;
+  if (loading) {
+    return <Loader text="Loading analytics..." />;
+  }
 
-  const today = new Date().toDateString();
+  // ---------------------------------------------------------
+  // DATE FILTER
+  // ---------------------------------------------------------
 
-  const ticketsToday = tickets.filter(
-    (t) =>
-      new Date(t.createdAtISO || t.createdAt).toDateString() === today
-  ).length;
+  const today = new Date();
 
-  const resolved = tickets.filter(
-    (t) => t.status === 'resolved'
-  ).length;
+  const fromDate = new Date();
+  fromDate.setDate(today.getDate() - days);
 
-  const escalated = tickets.filter(
-    (t) => t.escalated
-  ).length;
+  // ---------------------------------------------------------
+  // RECENT TICKETS
+  // ---------------------------------------------------------
 
-  const metrics = [
-    { label: 'Tickets Today', value: ticketsToday },
-    { label: 'Resolved', value: resolved },
-    { label: 'Escalated', value: escalated },
-  ];
+  const recentTickets = tickets.filter((ticket) => {
+    const date = new Date(
+      ticket.createdAtISO || ticket.createdAt
+    );
 
-  // Ticket volume for the last 7 days
-  const now = new Date();
-
-  const weeklyData = Array.from({ length: 7 }, (_, i) => {
-    const day = new Date(now);
-    day.setDate(now.getDate() - (6 - i));
-
-    const count = tickets.filter(
-      (t) =>
-        new Date(t.createdAtISO || t.createdAt).toDateString() ===
-        day.toDateString()
-    ).length;
-
-    return {
-      label: DAY_LABELS[day.getDay()],
-      count,
-    };
+    return date >= fromDate;
   });
 
-  const maxCount = Math.max(
-    1,
-    ...weeklyData.map((d) => d.count)
+  // ---------------------------------------------------------
+  // TICKET STATUS
+  // ---------------------------------------------------------
+
+  const statusData = [
+    {
+      name: "Open",
+      value: recentTickets.filter(
+        (ticket) =>
+          ticket.status?.toLowerCase() === "open"
+      ).length,
+    },
+
+    {
+      name: "Pending",
+      value: recentTickets.filter(
+        (ticket) =>
+          ticket.status?.toLowerCase() === "pending"
+      ).length,
+    },
+
+    {
+      name: "Resolved",
+      value: recentTickets.filter(
+        (ticket) =>
+          ticket.status?.toLowerCase() === "resolved"
+      ).length,
+    },
+
+    {
+      name: "Closed",
+      value: recentTickets.filter(
+        (ticket) =>
+          ticket.status?.toLowerCase() === "closed"
+      ).length,
+    },
+
+    {
+      name: "Escalated",
+      value: recentTickets.filter(
+        (ticket) =>
+          ticket.status?.toLowerCase() === "escalated" ||
+          ticket.escalated === true
+      ).length,
+    },
+  ];
+
+  // ---------------------------------------------------------
+  // TICKET CATEGORIES
+  // ---------------------------------------------------------
+
+  const categoryNames = [
+    ...new Set(
+      recentTickets.map(
+        (ticket) => ticket.category || "Other"
+      )
+    ),
+  ];
+
+  const categoryData = categoryNames.map((name) => ({
+    name,
+    value: recentTickets.filter(
+      (ticket) =>
+        (ticket.category || "Other") === name
+    ).length,
+  }));
+
+  // ---------------------------------------------------------
+  // PRIORITY
+  // ---------------------------------------------------------
+
+  const priorityData = [
+    {
+      name: "High",
+      value: recentTickets.filter(
+        (ticket) =>
+          ticket.priority?.toLowerCase() === "high"
+      ).length,
+    },
+
+    {
+      name: "Medium",
+      value: recentTickets.filter(
+        (ticket) =>
+          ticket.priority?.toLowerCase() === "medium"
+      ).length,
+    },
+
+    {
+      name: "Low",
+      value: recentTickets.filter(
+        (ticket) =>
+          ticket.priority?.toLowerCase() === "low"
+      ).length,
+    },
+
+    {
+      name: "Critical",
+      value: recentTickets.filter(
+        (ticket) =>
+          ticket.priority?.toLowerCase() === "critical"
+      ).length,
+    },
+  ];
+
+  // ---------------------------------------------------------
+  // TODAY'S SUPPORT SUMMARY
+  // ---------------------------------------------------------
+
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
+  const tomorrowStart = new Date(todayStart);
+  tomorrowStart.setDate(
+    todayStart.getDate() + 1
   );
 
-  return (
-    <div className="knowledge-base">
-      <div className="section-header">
-        <h1>Analytics</h1>
-      </div>
+  // Tickets CREATED today
 
-      <p
+  const ticketsToday = tickets.filter((ticket) => {
+    const createdDate = new Date(
+      ticket.createdAtISO || ticket.createdAt
+    );
+
+    return (
+      createdDate >= todayStart &&
+      createdDate < tomorrowStart
+    );
+  });
+
+  const ticketsTodayCount =
+    ticketsToday.length;
+
+  // Tickets RESOLVED today
+  // Uses resolvedAt from the backend
+
+  const resolvedToday = tickets.filter((ticket) => {
+    if (!ticket.resolvedAt) {
+      return false;
+    }
+
+    const resolvedDate = new Date(
+      ticket.resolvedAt
+    );
+
+    return (
+      resolvedDate >= todayStart &&
+      resolvedDate < tomorrowStart
+    );
+  });
+
+  const resolvedTodayCount =
+    resolvedToday.length;
+
+  // Currently escalated tickets
+
+  const escalatedCount = tickets.filter(
+    (ticket) =>
+      ticket.status?.toLowerCase() ===
+        "escalated" ||
+      ticket.escalated === true
+  ).length;
+
+  // ---------------------------------------------------------
+  // BAR WIDTH
+  // ---------------------------------------------------------
+
+  const createWidth = (value, data) => {
+    const maximum = Math.max(
+      ...data.map((item) => item.value),
+      1
+    );
+
+    if (value === 0) {
+      return "3%";
+    }
+
+    return `${Math.max(
+      (value / maximum) * 100,
+      8
+    )}%`;
+  };
+
+  // ---------------------------------------------------------
+  // BAR SECTION
+  // ---------------------------------------------------------
+
+  const BarSection = ({ title, data }) => (
+    <div
+      style={{
+        background: "#ffffff",
+        border: "1px solid #e5e7eb",
+        borderRadius: "16px",
+        padding: "24px",
+        boxShadow:
+          "0 1px 3px rgba(0,0,0,0.08)",
+      }}
+    >
+      <h2
         style={{
-          color: 'var(--text-muted)',
-          marginBottom: '1.5rem',
+          margin: "0 0 28px",
+          fontSize: "18px",
+          fontWeight: "600",
+          color: "var(--text)",
         }}
       >
-        Team performance and ticket trends at a glance.
-      </p>
+        {title}
+      </h2>
 
-      <div className="stats-grid">
-        {metrics.map((metric) => (
-          <div key={metric.label} className="stat-card blue">
-            <div className="stat-info">
-              <p>{metric.label}</p>
-            </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "22px",
+        }}
+      >
+        {data.length === 0 ? (
+          <div
+            style={{
+              height: "120px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "var(--text-muted)",
+            }}
+          >
+            No data available
           </div>
-        ))}
-      </div>
+        ) : (
+          data.map((item) => (
+            <div key={item.name}>
+              {/* LABEL */}
 
-      <div className="kb-card">
-        <h3 style={{ marginBottom: '1rem' }}>
-          Ticket Volume — Last 7 Days
-        </h3>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "8px",
+                  fontSize: "14px",
+                  color: "var(--text-muted)",
+                }}
+              >
+                <span>{item.name}</span>
+
+                <span
+                  style={{
+                    fontWeight: "600",
+                    color: "var(--text)",
+                  }}
+                >
+                  {item.value}
+                </span>
+              </div>
+
+              {/* BAR */}
+
+              <div
+                style={{
+                  width: "100%",
+                  height: "16px",
+                  background:
+                    "var(--border, #263244)",
+                  borderRadius: "20px",
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    width: createWidth(
+                      item.value,
+                      data
+                    ),
+                    height: "100%",
+                    background: "#2684ff",
+                    borderRadius: "20px",
+                    transition:
+                      "width 0.5s ease",
+                  }}
+                />
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+
+  // ---------------------------------------------------------
+  // RETURN
+  // ---------------------------------------------------------
+
+  return (
+    <div
+      style={{
+        padding: "24px",
+        minHeight: "100%",
+      }}
+    >
+      {/* HEADER */}
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "30px",
+          flexWrap: "wrap",
+          gap: "16px",
+        }}
+      >
+        <div>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: "28px",
+              fontWeight: "700",
+              color: "var(--text)",
+            }}
+          >
+            Analytics
+          </h1>
+
+          <p
+            style={{
+              margin: "6px 0 0",
+              color: "var(--text-muted)",
+            }}
+          >
+            Support activity overview
+          </p>
+        </div>
+
+        {/* DATE BUTTONS */}
 
         <div
           style={{
-            display: 'flex',
-            alignItems: 'flex-end',
-            gap: '0.75rem',
-            height: '160px',
+            display: "flex",
+            gap: "8px",
           }}
         >
-          {weeklyData.map((d) => (
-            <div
-              key={d.label}
+          {[7, 30, 90].map((option) => (
+            <button
+              key={option}
+              onClick={() => setDays(option)}
               style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                flex: 1,
-                gap: '0.4rem',
+                border: "none",
+                borderRadius: "8px",
+                padding: "9px 16px",
+                cursor: "pointer",
+                background:
+                  days === option
+                    ? "#2684ff"
+                    : "var(--border, #263244)",
+                color: "#fff",
+                fontWeight:
+                  days === option
+                    ? "600"
+                    : "400",
               }}
             >
-              <div
-                style={{
-                  width: '100%',
-                  maxWidth: '32px',
-                  height: `${(d.count / maxCount) * 120}px`,
-                  minHeight: d.count > 0 ? '4px' : '0',
-                  background: 'var(--cyan)',
-                  borderRadius: '4px 4px 0 0',
-                }}
-              />
-
-              <small style={{ color: 'var(--text-dim)' }}>
-                {d.label}
-              </small>
-            </div>
+              {option} Days
+            </button>
           ))}
+        </div>
+      </div>
+
+      {/* =====================================================
+          REPORT SECTIONS
+          ===================================================== */}
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns:
+            "repeat(auto-fit, minmax(350px, 1fr))",
+          gap: "20px",
+        }}
+      >
+        {/* STATUS */}
+
+        <BarSection
+          title="Ticket Status"
+          data={statusData}
+        />
+
+        {/* CATEGORIES */}
+
+        <BarSection
+          title="Ticket Categories"
+          data={categoryData}
+        />
+
+        {/* PRIORITY */}
+
+        <BarSection
+          title="Priority"
+          data={priorityData}
+        />
+      </div>
+
+      {/* =====================================================
+          TODAY'S SUPPORT SUMMARY
+          ===================================================== */}
+
+      <div
+        style={{
+          marginTop: "24px",
+          background: "#ffffff",
+          border: "1px solid #e5e7eb",
+          borderRadius: "16px",
+          padding: "24px",
+          boxShadow:
+            "0 1px 3px rgba(0,0,0,0.08)",
+        }}
+      >
+        <h2
+          style={{
+            margin: "0 0 20px",
+            fontSize: "18px",
+            fontWeight: "600",
+            color: "var(--text)",
+          }}
+        >
+          Today's Support Summary
+        </h2>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fit, minmax(180px, 1fr))",
+            gap: "16px",
+          }}
+        >
+          {/* =================================================
+              TICKETS TODAY
+              ================================================= */}
+
+          <div
+            style={{
+              padding: "20px",
+              borderRadius: "12px",
+              background: "#f5f9ff",
+              border: "1px solid #dbeafe",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "14px",
+                color: "var(--text-muted)",
+                marginBottom: "8px",
+              }}
+            >
+              Tickets Today
+            </div>
+
+            <div
+              style={{
+                fontSize: "30px",
+                fontWeight: "700",
+                color: "var(--text)",
+              }}
+            >
+              {ticketsTodayCount}
+            </div>
+          </div>
+
+          {/* =================================================
+              RESOLVED TODAY
+              ================================================= */}
+
+          <div
+            style={{
+              padding: "20px",
+              borderRadius: "12px",
+              background: "#f0fdf4",
+              border: "1px solid #bbf7d0",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "14px",
+                color: "var(--text-muted)",
+                marginBottom: "8px",
+              }}
+            >
+              Resolved Today
+            </div>
+
+            <div
+              style={{
+                fontSize: "30px",
+                fontWeight: "700",
+                color: "var(--text)",
+              }}
+            >
+              {resolvedTodayCount}
+            </div>
+          </div>
+
+          {/* =================================================
+              ESCALATED
+              ================================================= */}
+
+          <div
+            style={{
+              padding: "20px",
+              borderRadius: "12px",
+              background: "#fff7ed",
+              border: "1px solid #fed7aa",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "14px",
+                color: "var(--text-muted)",
+                marginBottom: "8px",
+              }}
+            >
+              Escalated
+            </div>
+
+            <div
+              style={{
+                fontSize: "30px",
+                fontWeight: "700",
+                color: "var(--text)",
+              }}
+            >
+              {escalatedCount}
+            </div>
+          </div>
         </div>
       </div>
     </div>
